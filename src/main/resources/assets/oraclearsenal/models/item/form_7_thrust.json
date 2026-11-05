@@ -1,0 +1,109 @@
+{
+  "parent": "oraclearsenal:item/form_7",
+  "display": {
+    "thirdperson_righthand": {
+      "rotation": [
+        0,
+        90,
+        0
+      ],
+      "translation": [
+        11,
+        3,
+        -21
+      ],
+      "scale": [
+        1.97826,
+        3.26087,
+        3.26087
+      ]
+    },
+    "thirdperson_lefthand": {
+      "rotation": [
+        0,
+        -90,
+        0
+      ],
+      "translation": [
+        -11,
+        3,
+        -21
+      ],
+      "scale": [
+        1.97826,
+        3.26087,
+        3.26087
+      ]
+    },
+    "firstperson_righthand": {
+      "rotation": [
+        83,
+        54,
+        -15
+      ],
+      "translation": [
+        29,
+        0.5,
+        -1
+      ],
+      "scale": [
+        4.0,
+        4.0,
+        4.0
+      ]
+    },
+    "firstperson_lefthand": {
+      "rotation": [
+        0,
+        -90,
+        -105
+      ],
+      "translation": [
+        -1.5,
+        0.5,
+        -1
+      ],
+      "scale": [
+        0.76087,
+        0.76087,
+        0.76087
+      ]
+    },
+    "ground": {
+      "translation": [
+        0,
+        2,
+        0
+      ],
+      "scale": [
+        0.43478,
+        0.43478,
+        0.43478
+      ]
+    },
+    "gui": {
+      "rotation": [
+        30,
+        -135,
+        0
+      ],
+      "scale": [
+        0.36,
+        0.36,
+        0.36
+      ]
+    },
+    "fixed": {
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "scale": [
+        0.5,
+        0.5,
+        0.5
+      ]
+    }
+  }
+}

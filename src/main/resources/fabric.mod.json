@@ -1,0 +1,31 @@
+{
+  "schemaVersion": 1,
+  "id": "oraclearsenal",
+  "version": "${version}",
+  "name": "里恩模组",
+  "description": "无声的鼓掌，无言的斩下。",
+  "authors": [],
+  "contact": {},
+  "license": "All Rights Reserved",
+  "environment": "*",
+  "entrypoints": {
+    "main": [
+      "io.github.oraclearsenal.OracleArsenal"
+    ],
+    "client": [
+      "io.github.oraclearsenal.client.OracleClient"
+    ]
+  },
+  "mixins": [
+    "oraclearsenal.mixins.json",
+    "oraclearsenal.client.mixins.json"
+  ],
+  "depends": {
+    "fabricloader": ">=0.16.0",
+    "minecraft": "~1.21.1",
+    "java": ">=21",
+    "fabric-api": "*",
+    "playeranimator": ">=2.0.4"
+  },
+  "icon": "assets/oraclearsenal/icon.png"
+}

@@ -1,0 +1,13 @@
+{
+  "required": true,
+  "package": "io.github.oraclearsenal.client.mixin",
+  "compatibilityLevel": "JAVA_21",
+  "client": [
+    "FirstPersonWeaponMixin",
+    "LacrimosaCameraMixin",
+    "LacrimosaHandsMixin"
+  ],
+  "injectors": {
+    "defaultRequire": 1
+  }
+}

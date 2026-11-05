@@ -1,0 +1,23 @@
+# Gradle / build output
+.gradle/
+build/
+run/
+out/
+.idea/
+*.iml
+*.log
+.DS_Store
+
+# Local art sources and Blockbench projects (not part of the mod source)
+art_sources/
+blockbench/
+
+# Root-level preview renders
+/*.png
+
+# Root-level development notes; keep only the README
+/*.md
+!/README.md
+/*.txt
+/*.bat
+/*.html

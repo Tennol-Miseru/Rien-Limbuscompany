@@ -1,0 +1,176 @@
+{
+  "weapon_change": {
+    "subtitle": "subtitles.oraclearsenal.weapon_change",
+    "sounds": [
+      {
+        "name": "oraclearsenal:weapon/change_1",
+        "type": "file"
+      },
+      {
+        "name": "oraclearsenal:weapon/change_2",
+        "type": "file"
+      },
+      {
+        "name": "oraclearsenal:weapon/change_3",
+        "type": "file"
+      }
+    ]
+  },
+  "strike_slash": {
+    "subtitle": "subtitles.oraclearsenal.strike_slash",
+    "sounds": [
+      {
+        "name": "oraclearsenal:combat/slash_1",
+        "type": "file"
+      },
+      {
+        "name": "oraclearsenal:combat/slash_2",
+        "type": "file"
+      },
+      {
+        "name": "oraclearsenal:combat/slash_3",
+        "type": "file"
+      },
+      {
+        "name": "oraclearsenal:combat/slash_4",
+        "type": "file"
+      },
+      {
+        "name": "oraclearsenal:combat/slash_5",
+        "type": "file"
+      }
+    ]
+  },
+  "strike_impact": {
+    "subtitle": "subtitles.oraclearsenal.strike_impact",
+    "sounds": [
+      {
+        "name": "oraclearsenal:combat/impact_1",
+        "type": "file"
+      },
+      {
+        "name": "oraclearsenal:combat/impact_2",
+        "type": "file"
+      }
+    ]
+  },
+  "strike_pierce": {
+    "subtitle": "subtitles.oraclearsenal.strike_pierce",
+    "sounds": [
+      {
+        "name": "oraclearsenal:combat/pierce_1",
+        "type": "file"
+      },
+      {
+        "name": "oraclearsenal:combat/pierce_2",
+        "type": "file"
+      },
+      {
+        "name": "oraclearsenal:combat/pierce_3",
+        "type": "file"
+      }
+    ]
+  },
+  "strike_whip": {
+    "subtitle": "subtitles.oraclearsenal.strike_whip",
+    "sounds": [
+      {
+        "name": "oraclearsenal:combat/whip",
+        "type": "file"
+      }
+    ]
+  },
+  "strike_scythe": {
+    "subtitle": "subtitles.oraclearsenal.strike_scythe",
+    "sounds": [
+      {
+        "name": "oraclearsenal:combat/scythe_1",
+        "type": "file"
+      },
+      {
+        "name": "oraclearsenal:combat/scythe_2",
+        "type": "file"
+      }
+    ]
+  },
+  "strike_scythe_final": {
+    "subtitle": "subtitles.oraclearsenal.strike_scythe_final",
+    "sounds": [
+      {
+        "name": "oraclearsenal:combat/scythe_final",
+        "type": "file"
+      }
+    ]
+  },
+  "metal_clash": {
+    "subtitle": "subtitles.oraclearsenal.metal_clash",
+    "sounds": [
+      {
+        "name": "oraclearsenal:combat/metal_clash",
+        "type": "file"
+      }
+    ]
+  },
+  "parry": {
+    "subtitle": "subtitles.oraclearsenal.parry",
+    "sounds": [
+      {
+        "name": "oraclearsenal:combat/parry",
+        "type": "file"
+      }
+    ]
+  },
+  "rien_effort": {
+    "subtitle": "subtitles.oraclearsenal.rien_effort",
+    "sounds": [
+      {
+        "name": "oraclearsenal:character/effort_1",
+        "type": "file"
+      },
+      {
+        "name": "oraclearsenal:character/effort_2",
+        "type": "file"
+      },
+      {
+        "name": "oraclearsenal:character/effort_3",
+        "type": "file"
+      }
+    ]
+  },
+  "rien_laugh": {
+    "subtitle": "subtitles.oraclearsenal.rien_laugh",
+    "sounds": [
+      {
+        "name": "oraclearsenal:character/laugh",
+        "type": "file"
+      }
+    ]
+  },
+  "mask_drop": {
+    "subtitle": "subtitles.oraclearsenal.mask_drop",
+    "sounds": [
+      {
+        "name": "oraclearsenal:character/mask_drop",
+        "type": "file"
+      }
+    ]
+  },
+  "mask_scars": {
+    "subtitle": "subtitles.oraclearsenal.mask_scars",
+    "sounds": [
+      {
+        "name": "oraclearsenal:character/scars",
+        "type": "file"
+      }
+    ]
+  },
+  "prescript_beep": {
+    "subtitle": "subtitles.oraclearsenal.prescript_beep",
+    "sounds": [
+      {
+        "name": "oraclearsenal:ui/prescript_beep",
+        "type": "file"
+      }
+    ]
+  }
+}

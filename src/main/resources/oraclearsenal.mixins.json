@@ -1,0 +1,11 @@
+{
+  "required": true,
+  "package": "io.github.oraclearsenal.mixin",
+  "compatibilityLevel": "JAVA_21",
+  "mixins": [
+    "PlayerCrescendoCooldownMixin"
+  ],
+  "injectors": {
+    "defaultRequire": 1
+  }
+}

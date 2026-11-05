@@ -1,0 +1,218 @@
+plugins {
+    id 'fabric-loom' version '1.11.8'
+    id 'maven-publish'
+}
+
+version = project.mod_version
+group = project.maven_group
+
+base {
+    archivesName = project.archives_base_name
+}
+
+repositories {
+    mavenCentral()
+    maven { url = "https://maven.kosmx.dev/" }
+}
+
+dependencies {
+    minecraft "com.mojang:minecraft:${project.minecraft_version}"
+    mappings loom.officialMojangMappings()
+    modImplementation "net.fabricmc:fabric-loader:${project.loader_version}"
+    modImplementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_version}"
+    modImplementation "dev.kosmx.player-anim:player-animation-lib-fabric:${project.player_anim_version}"
+}
+
+processResources {
+    inputs.property 'version', project.version
+    filesMatching('fabric.mod.json') {
+        expand 'version': project.version
+    }
+}
+
+tasks.withType(JavaCompile).configureEach {
+    options.release = 21
+    options.encoding = 'UTF-8'
+}
+
+java {
+    sourceCompatibility = JavaVersion.VERSION_21
+    targetCompatibility = JavaVersion.VERSION_21
+    withSourcesJar()
+}
+
+loom {
+    splitEnvironmentSourceSets()
+    mods {
+        oraclearsenal {
+            sourceSet sourceSets.main
+            sourceSet sourceSets.client
+        }
+    }
+}
+
+// Animation mixin is client-only and compiles against Minecraft's first-person renderer.
+
+// V0.10.40: Validate native 1.21.1 item model fields and ALL resource references.
+// Previously this task was hard-coded for 615 scythe elements and a single
+// alpha-plane whip; the new weapon handoff uses a 1063-element solid scythe
+// and a fully modeled whip. Use structural validation rather than old artwork.
+tasks.register('validateWeaponModels') {
+    def assets = file('src/main/resources/assets/oraclearsenal')
+    def modelDirectory = new File(assets, 'models/item')
+    inputs.dir(modelDirectory)
+    inputs.dir(new File(assets, 'textures/item'))
+    doLast {
+        def parser = new groovy.json.JsonSlurper()
+        def required = ['twin_serpent_staff'] + (1..10).collect { "form_${it}" } + ['form_7_thrust', 'form_9_final']
+        def validAngles = [-45.0d, -22.5d, 0.0d, 22.5d, 45.0d]
+        required.each { name ->
+            def source = new File(modelDirectory, "${name}.json")
+            if (!source.isFile()) throw new GradleException("Missing weapon model: ${name}")
+            def model = parser.parse(source)
+            if (name.startsWith('form_') && name != 'form_7_thrust' && name != 'form_9_final'
+                    || name == 'twin_serpent_staff') {
+                if (!(model.elements instanceof List) || model.elements.isEmpty()) {
+                    throw new GradleException("${name}: model elements missing")
+                }
+            }
+            if (model.parent instanceof String && model.parent.startsWith('oraclearsenal:item/')) {
+                def parentName = model.parent.substring('oraclearsenal:item/'.length())
+                if (!new File(modelDirectory, "${parentName}.json").isFile()) {
+                    throw new GradleException("${name}: missing model parent ${model.parent}")
+                }
+            }
+            if (model.textures instanceof Map) {
+                model.textures.each { key, value ->
+                    if (value instanceof String && value.startsWith('oraclearsenal:item/')) {
+                        def texName = value.substring('oraclearsenal:item/'.length())
+                        if (!new File(assets, "textures/item/${texName}.png").isFile()) {
+                            throw new GradleException("${name}: missing texture ${value}")
+                        }
+                    }
+                }
+            }
+            if (model.elements instanceof List) model.elements.eachWithIndex { part, index ->
+                if (!(part.from instanceof List) || !(part.to instanceof List)
+                        || part.from.size() != 3 || part.to.size() != 3) {
+                    throw new GradleException("${name} element ${index}: invalid from/to")
+                }
+                for (int axisIndex=0; axisIndex<3; axisIndex++) {
+                    def lo = part.from[axisIndex]
+                    def hi = part.to[axisIndex]
+                    if (!(lo instanceof Number) || !(hi instanceof Number)
+                        || lo.doubleValue() < -16d || hi.doubleValue() > 32d
+                        || lo.doubleValue() >= hi.doubleValue()) {
+                        throw new GradleException("${name} element ${index}: invalid bounds")
+                    }
+                }
+                if (part.rotation != null) {
+                    def r=part.rotation
+                    if (!['x','y','z'].contains(r.axis)
+                        || !(r.angle instanceof Number)
+                        || !validAngles.any { ang -> Math.abs(ang-r.angle.doubleValue()) < .0001d }
+                        || !(r.origin instanceof List) || r.origin.size() != 3
+                        || !r.origin.every { it instanceof Number }) {
+                        throw new GradleException("${name} element ${index}: native rotation invalid ${r}")
+                    }
+                }
+                if (!(part.faces instanceof Map) || part.faces.isEmpty())
+                    throw new GradleException("${name} element ${index}: missing faces")
+                part.faces.each { faceDirection, face ->
+                    def textureId = face.texture
+                    if (!(textureId instanceof String) || !textureId.startsWith('#')
+                            || !(model.textures instanceof Map)
+                            || !model.textures.containsKey(textureId.substring(1))) {
+                        throw new GradleException("${name} element ${index} face ${faceDirection}: unresolved texture ${textureId}")
+                    }
+                }
+            }
+        }
+        def staff = parser.parse(new File(modelDirectory,'twin_serpent_staff.json'))
+        def commands = staff.overrides.collectEntries { o ->
+            [(o.predicate.custom_model_data.intValue()): o.model]
+        }
+        (1..10).each { n ->
+            if (commands[n] != "oraclearsenal:item/form_${n}")
+                throw new GradleException("Missing CustomModelData ${n}")
+        }
+        if (commands[17] != 'oraclearsenal:item/form_7_thrust'
+                || commands[19] != 'oraclearsenal:item/form_9_final') {
+            throw new GradleException('Combat variants CMD 17 and 19 must remain available')
+        }
+        if (parser.parse(new File(modelDirectory,'form_7_thrust.json')).parent != 'oraclearsenal:item/form_7'
+                || parser.parse(new File(modelDirectory,'form_9_final.json')).parent != 'oraclearsenal:item/form_9') {
+            throw new GradleException('Weapon attack display variants must inherit current geometry')
+        }
+        // Form VI was supplied with two animation frames changing every tick.
+        // The high-frequency flip visibly flickers: ship the single-frame atlas.
+        def blade = new File(assets,'textures/item/form6_blade.png')
+        def meta = new File(assets,'textures/item/form6_blade.png.mcmeta')
+        if (meta.exists()) throw new GradleException('Form VI blade must NOT animate (flicker regression)')
+        def bladeImage = javax.imageio.ImageIO.read(blade)
+        if (bladeImage == null || bladeImage.width != 512 || bladeImage.height != 512)
+            throw new GradleException('Form VI blade must be a static 512x512 texture')
+        logger.lifecycle('[OK] 11 native-compatible weapon models + CMD 17/19 and textures verified.')
+    }
+}
+tasks.named('processResources') { dependsOn('validateWeaponModels') }
+
+// V0.10.10: Keep the expected 14 events / 26 approved OGG clips in sync
+// with sounds.json after removing the erroneous crescendo_cue. Reject missing,
+// extra, unreferenced or non-OGG files. No conversion at build time.
+tasks.register('validateRienSounds') {
+    def audioDir = file('src/main/resources/assets/oraclearsenal/sounds')
+    def soundManifest = file('src/main/resources/assets/oraclearsenal/sounds.json')
+    inputs.dir(audioDir)
+    inputs.file(soundManifest)
+    doLast {
+        def catalog = new groovy.json.JsonSlurper().parse(soundManifest)
+        def expectedEvents = [
+            'weapon_change', 'strike_slash', 'strike_impact', 'strike_pierce',
+            'strike_whip', 'strike_scythe', 'strike_scythe_final', 'metal_clash',
+            'parry', 'rien_effort', 'rien_laugh', 'mask_drop', 'mask_scars',
+            'prescript_beep'
+        ]
+        if (catalog.keySet().sort() != expectedEvents.sort()) {
+            throw new GradleException('Rien sound event registry and sounds.json differ')
+        }
+        def allFiles = []
+        catalog.each { event, detail ->
+            detail.sounds.each { entry ->
+                def soundName = entry.name.toString()
+                if (!soundName.startsWith('oraclearsenal:')) {
+                    throw new GradleException('Wrong namespace for sound: ' + soundName)
+                }
+                def relative = soundName.substring('oraclearsenal:'.length()) + '.ogg'
+                def soundFile = new File(audioDir, relative)
+                if (!soundFile.isFile()) {
+                    throw new GradleException('Missing Rien sound: ' + relative)
+                }
+                def header = new byte[4]
+                soundFile.withInputStream { stream -> stream.read(header) }
+                if (new String(header, java.nio.charset.StandardCharsets.US_ASCII) != 'OggS') {
+                    throw new GradleException('Invalid OGG header (possible MP3 masquerading as OGG): ' + relative)
+                }
+                allFiles.add(soundFile.canonicalPath)
+            }
+        }
+        if (allFiles.size() != 26 || allFiles.toSet().size() != 26) {
+            throw new GradleException('Expected 26 distinct supplied Rien sound clips')
+        }
+        // Prevent old or unreferenced .ogg clips from silently being shipped again.
+        def onDisk = fileTree(audioDir) { include '**/*.ogg' }.files.collect { it.canonicalPath }.toSet()
+        if (onDisk != allFiles.toSet()) {
+            throw new GradleException('Sound files on disk differ from sounds.json: check removed or unreferenced OGG clips')
+        }
+        logger.lifecycle('[OK] 14 Rien sound events / 26 genuine OGG Vorbis clips verified.')
+    }
+}
+tasks.named('processResources') { dependsOn('validateRienSounds') }
+
+// v0.10.40: Optional longsword form 10 is accessible through the staff only.
+tasks.named('validateWeaponModels') {
+    doLast {
+        if (file('src/main/resources/data/oraclearsenal/recipe/ink_longsword.json').exists())
+            throw new GradleException('Ink longsword must not be an independently craftable item')
+    }
+}
